@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FleetCheck Pro - Gestão de Frota</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --success: #16a34a;
+            --success-light: #f0fdf4;
+            --warning: #d97706;
+            --warning-light: #fffbeb;
+            --danger: #dc2626;
+            --danger-light: #fef2f2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.15);
+            --sidebar-w: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ========== SCROLLBAR ========== */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+
+        /* ========== LOGIN ========== */
+        .login-screen {
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb, #3b82f6);
+            padding: 16px;
+        }
+
+        .login-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 32px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-box .logo { text-align: center; margin-bottom: 28px; }
+        .login-box .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            border-radius: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 12px;
+        }
+        .login-box .logo-icon svg { width: 34px; height: 34px; fill: #fff; }
+        .login-box .logo h1 { font-size: 22px; font-weight: 800; color: var(--gray-900); }
+        .login-box .logo p { font-size: 13px; color: var(--gray-500); }
+
+        /* ========== FORM ELEMENTS ========== */
+        .fg { margin-bottom: 16px; }
+        .fg label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; }
+        .fg input, .fg select, .fg textarea {
+            width: 100%; padding: 11px 14px; border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm); font-size: 14px; color: var(--gray-900);
+            background: #fff; font-family: inherit; transition: border-color .2s;
+        }
+        .fg input:focus, .fg select:focus, .fg textarea:focus {
+            outline: none; border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+        }
+        .fg textarea { resize: vertical; min-height: 72px; }
+        .fg-row { display: grid; gap: 12px; }
+        .fg-row.c2 { grid-template-columns: 1fr 1fr; }
+        .fg-row.c3 { grid-template-columns: 1fr 1fr 1fr; }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            padding: 10px 20px; border-radius: var(--radius-sm); font-size: 14px;
+            font-weight: 600; border: none; cursor: pointer; transition: all .2s;
+            font-family: inherit; text-decoration: none; white-space: nowrap;
+        }
+        .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .btn-p { background: var(--primary); color: #fff; }
+        .btn-p:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-s { background: var(--success); color: #fff; }
+        .btn-s:hover { background: #15803d; }
+        .btn-d { background: var(--danger); color: #fff; }
+        .btn-d:hover { background: #b91c1c; }
+        .btn-w { background: var(--warning); color: #fff; }
+        .btn-o { background: #fff; color: var(--primary); border: 2px solid var(--primary); padding: 8px 18px; }
+        .btn-o:hover { background: var(--primary-light); }
+        .btn-g { background: transparent; color: var(--gray-600); }
+        .btn-g:hover { background: var(--gray-100); }
+        .btn-full { width: 100%; }
+        .btn-lg { padding: 13px 24px; font-size: 15px; }
+        .btn-sm { padding: 7px 14px; font-size: 12px; }
+        .btn-xs { padding: 5px 10px; font-size: 11px; }
+        .btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; }
+
+        .link-btn { text-align: center; margin-top: 16px; font-size: 13px; color: var(--gray-500); }
+        .link-btn a { color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: none; }
+        .link-btn a:hover { text-decoration: underline; }
+
+        /* ========== APP LAYOUT ========== */
+        .app { display: none; min-height: 100dvh; }
+        .app.on { display: flex; }
+
+        /* Sidebar */
+        .side {
+            width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200);
+            position: fixed; top: 0; left: 0; height: 100dvh; z-index: 200;
+            display: flex; flex-direction: column; transition: transform .3s ease;
+        }
+        .side-head {
+            padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .side-head .ico {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), #1e40af);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .side-head .ico svg { width: 20px; height: 20px; fill: #fff; }
+        .side-head span { font-size: 17px; font-weight: 800; color: var(--gray-900); }
+
+        .side-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+        .nav-lbl {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .8px; color: var(--gray-400); padding: 6px 12px;
+            margin-top: 12px;
+        }
+        .nav-lbl:first-child { margin-top: 0; }
+        .ni {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: var(--radius-sm);
+            cursor: pointer; transition: all .15s; color: var(--gray-600);
+            font-size: 13px; font-weight: 500; position: relative;
+        }
+        .ni:hover { background: var(--gray-50); color: var(--gray-800); }
+        .ni.on { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+        .ni svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .ni .bdg {
+            margin-left: auto; background: var(--danger); color: #fff;
+            font-size: 10px; font-weight: 700; padding: 1px 7px;
+            border-radius: 20px; min-width: 18px; text-align: center;
+        }
+
+        .side-foot {
+            padding: 12px 14px; border-top: 1px solid var(--gray-200);
+        }
+        .side-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px; cursor: pointer; border-radius: var(--radius-sm);
+            transition: background .15s;
+        }
+        .side-user:hover { background: var(--gray-50); }
+        .uav {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--primary); display: flex;
+            align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 13px; flex-shrink: 0;
+            overflow: hidden;
+        }
+        .uav img { width: 100%; height: 100%; object-fit: cover; }
+        .udt { flex: 1; min-width: 0; }
+        .udt .nm { font-size: 13px; font-weight: 600; color: var(--gray-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .udt .rl { font-size: 11px; color: var(--gray-400); }
+
+        /* Main */
+        .main { flex: 1; margin-left: var(--sidebar-w); min-height: 100dvh; }
+        .topbar {
+            background: #fff; border-bottom: 1px solid var(--gray-200);
+            padding: 12px 24px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        }
+        .topbar h2 { font-size: 18px; font-weight: 700; }
+        .topbar-l { display: flex; align-items: center; gap: 10px; }
+        .topbar-r { display: flex; align-items: center; gap: 8px; }
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+        .hamburger svg { width: 22px; height: 22px; fill: var(--gray-700); }
+
+        .pg-content { padding: 24px; }
+        .pv { display: none; animation: fadeUp .25s ease; }
+        .pv.on { display: block; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        /* Overlay */
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 150; }
+        .overlay.on { display: block; }
+
+        /* ========== CARDS / TABLES ========== */
+        .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+        .card-h { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+        .card-h h3 { font-size: 15px; font-weight: 700; }
+        .card-b { padding: 20px; }
+
+        .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; }
+        table th {
+            padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px; color: var(--gray-500);
+            background: var(--gray-50); border-bottom: 2px solid var(--gray-200);
+            white-space: nowrap;
+        }
+        table td { padding: 12px 14px; font-size: 13px; border-bottom: 1px solid var(--gray-100); }
+        table tr:hover td { background: var(--gray-50); }
+
+        /* Status */
+        .st {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        }
+        .st-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .st-ok { background: var(--success-light); color: var(--success); }
+        .st-ok .st-dot { background: var(--success); }
+        .st-pend { background: var(--warning-light); color: var(--warning); }
+        .st-pend .st-dot { background: var(--warning); }
+        .st-fail { background: var(--danger-light); color: var(--danger); }
+        .st-fail .st-dot { background: var(--danger); }
+
+        .cond {
+            padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600;
+        }
+        .cond-b { background: var(--success-light); color: var(--success); }
+        .cond-m { background: var(--warning-light); color: var(--warning); }
+        .cond-r { background: var(--danger-light); color: var(--danger); }
+
+        .acts { display: flex; gap: 4px; flex-wrap: wrap; }
+
+        /* Stats */
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat {
+            background: #fff; border-radius: var(--radius); padding: 20px;
+            box-shadow: var(--shadow); display: flex; align-items: flex-start; gap: 14px;
+        }
+        .stat-i {
+            width: 44px; height: 44px; border-radius: 11px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .stat-i svg { width: 22px; height: 22px; }
+        .stat-i.bl { background: var(--primary-light); }
+        .stat-i.bl svg { fill: var(--primary); }
+        .stat-i.gn { background: var(--success-light); }
+        .stat-i.gn svg { fill: var(--success); }
+        .stat-i.or { background: var(--warning-light); }
+        .stat-i.or svg { fill: var(--warning); }
+        .stat-i.rd { background: var(--danger-light); }
+        .stat-i.rd svg { fill: var(--danger); }
+        .stat-d h3 { font-size: 26px; font-weight: 800; line-height: 1.1; }
+        .stat-d p { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+        /* ========== FORM SECTIONS ========== */
+        .fsec { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+        .fsec-h {
+            padding: 14px 20px; background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .fsec-h .num {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+        }
+        .fsec-h h3 { font-size: 14px; font-weight: 700; }
+        .fsec-b { padding: 20px; }
+
+        /* Checklist */
+        .cli {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 11px 14px; border-bottom: 1px solid var(--gray-100);
+        }
+        .cli:last-child { border-bottom: none; }
+        .cli .cn { font-size: 13px; font-weight: 500; flex: 1; }
+        .tg { display: flex; gap: 3px; }
+        .tg button {
+            padding: 5px 13px; border: 2px solid var(--gray-300); background: #fff;
+            border-radius: 5px; font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: all .15s; color: var(--gray-500);
+        }
+        .tg button.y.on { background: var(--success); border-color: var(--success); color: #fff; }
+        .tg button.n.on { background: var(--danger); border-color: var(--danger); color: #fff; }
+        .tg button.cr.on { background: var(--danger); border-color: var(--danger); color: #fff; }
+        .tg button.cm.on { background: var(--warning); border-color: var(--warning); color: #fff; }
+        .tg button.cb.on { background: var(--success); border-color: var(--success); color: #fff; }
+
+        /* Photo grid */
+        .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .pslot {
+            aspect-ratio: 4/3; border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-sm); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+            background: var(--gray-50); position: relative; overflow: hidden;
+            transition: all .15s;
+        }
+        .pslot:hover { border-color: var(--primary); background: var(--primary-light); }
+        .pslot svg { width: 28px; height: 28px; fill: var(--gray-400); margin-bottom: 4px; }
+        .pslot span { font-size: 10px; color: var(--gray-500); font-weight: 500; text-align: center; padding: 0 4px; }
+        .pslot img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+        .pslot .xp {
+            position: absolute; top: 4px; right: 4px; width: 22px; height: 22px;
+            background: var(--danger); border: none; border-radius: 50%;
+            color: #fff; font-size: 14px; cursor: pointer; display: none;
+            align-items: center; justify-content: center; z-index: 2;
+        }
+        .pslot.has .xp { display: flex; }
+        .pslot.has svg, .pslot.has > span { display: none; }
+
+        /* ========== MODAL ========== */
+        .modal-ov {
+            position: fixed; inset: 0; background: rgba(0,0,0,.5);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 16px; backdrop-filter: blur(3px);
+        }
+        .modal-ov.on { display: flex; }
+        .modal {
+            background: #fff; border-radius: var(--radius); width: 100%;
+            max-height: 90dvh; overflow-y: auto; box-shadow: var(--shadow-lg);
+        }
+        .modal-sm { max-width: 420px; }
+        .modal-md { max-width: 600px; }
+        .modal-lg { max-width: 800px; }
+        .modal-xl { max-width: 950px; }
+        .m-h { padding: 16px 20px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; }
+        .m-h h3 { font-size: 16px; font-weight: 700; }
+        .m-x { width: 30px; height: 30px; border: none; background: var(--gray-100); border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--gray-600); display: flex; align-items: center; justify-content: center; }
+        .m-x:hover { background: var(--gray-200); }
+        .m-b { padding: 20px; }
+        .m-f { padding: 14px 20px; border-top: 1px solid var(--gray-200); display: flex; justify-content: flex-end; gap: 8px; align-items: center; }
+
+        /* ========== TOAST ========== */
+        .toasts { position: fixed; top: 16px; right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            background: #fff; border-radius: var(--radius-sm); padding: 14px 18px;
+            box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px;
+            min-width: 280px; max-width: 400px; animation: tIn .3s ease; border-left: 4px solid;
+            font-size: 13px; font-weight: 500;
+        }
+        .toast.suc { border-left-color: var(--success); }
+        .toast.err { border-left-color: var(--danger); }
+        .toast.wrn { border-left-color: var(--warning); }
+        .toast.inf { border-left-color: var(--primary); }
+        @keyframes tIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* ========== PHOTO GALLERY IN DETAIL ========== */
+        .pgal { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+        .pgal img { width: 100px; height: 75px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: transform .15s; border: 2px solid var(--gray-200); }
+        .pgal img:hover { transform: scale(1.05); }
+
+        /* Detail grid */
+        .dtg { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .dti label { font-size: 11px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; }
+        .dti p { font-size: 14px; color: var(--gray-900); font-weight: 500; margin-top: 2px; }
+
+        /* Profile */
+        .profile-avatar-wrap {
+            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 16px;
+            position: relative; overflow: hidden; cursor: pointer;
+            background: var(--primary); display: flex; align-items: center;
+            justify-content: center;
+        }
+        .profile-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-avatar-wrap .pav-txt { color: #fff; font-size: 36px; font-weight: 800; }
+        .profile-avatar-wrap .pav-ov {
+            position: absolute; inset: 0; background: rgba(0,0,0,.5);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity .2s;
+        }
+        .profile-avatar-wrap:hover .pav-ov { opacity: 1; }
+        .profile-avatar-wrap .pav-ov svg { width: 28px; height: 28px; fill: #fff; }
+
+        /* Vehicle detail photos */
+        .veh-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 10px; margin: 12px 0; }
+        .veh-photos img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 8px; border: 2px solid var(--gray-200); }
+
+        /* ========== CAR DIAGRAM - REALISTIC ========== */
+        .car-svg-wrap { text-align: center; padding: 10px; }
+        .car-svg-wrap svg { max-width: 520px; width: 100%; cursor: crosshair; }
+
+        /* ========== PRINT ========== */
+        .print-area { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            .print-area, .print-area * { visibility: visible; }
+            .print-area {
+                display: block; position: fixed; left: 0; top: 0;
+                width: 100%; background: #fff; padding: 20px; z-index: 99999;
+            }
+            .print-area h1 { font-size: 18px; margin-bottom: 4px; }
+            .print-area h2 { font-size: 14px; margin: 12px 0 6px; color: var(--gray-700); }
+            .print-area table { font-size: 11px; }
+            .print-area table th, .print-area table td { padding: 4px 8px; border: 1px solid #ccc; }
+            .print-area .pi-photos img { width: 100px; height: 75px; object-fit: cover; margin: 2px; }
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .fg-row.c3 { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .side { transform: translateX(-100%); }
+            .side.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+            .main { margin-left: 0; }
+            .hamburger { display: block; }
+            .pg-content { padding: 16px; }
+            .topbar { padding: 10px 16px; }
+            .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat { padding: 14px; }
+            .stat-d h3 { font-size: 20px; }
+            .fg-row.c2, .fg-row.c3 { grid-template-columns: 1fr; }
+            .pgrid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .cli { flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 14px; }
+            table { font-size: 12px; }
+            table th, table td { padding: 8px 10px; }
+            .modal { border-radius: var(--radius-sm); }
+            .toast { min-width: 240px; font-size: 12px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat { flex-direction: column; gap: 8px; padding: 12px; }
+            .pgrid { grid-template-columns: repeat(2, 1fr); }
+            .login-box { padding: 28px 20px; }
+        }
+
+        /* Device indicator */
+        .device-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 10px; color: var(--gray-400); padding: 2px 8px;
+            background: var(--gray-100); border-radius: 10px; margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="toasts" id="toasts"></div>
+
+<!-- ====== LOGIN ====== -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <div class="logo">
+            <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+            <h1>FleetCheck Pro</h1>
+            <p>Sistema de Gestão de Frota Veicular</p>
+        </div>
+        <div id="frmLogin">
+            <div class="fg"><label>E-mail</label><input type="email" id="lEmail" placeholder="seu@email.com"></div>
+            <div class="fg"><label>Senha</label><input type="password" id="lPass" placeholder="Sua senha"></div>
+            <button class="btn btn-p btn-full btn-lg" onclick="doLogin()">Entrar</button>
+            <div class="link-btn">Não tem conta? <a onclick="showReg()">Criar conta</a></div>
+        </div>
+        <div id="frmReg" style="display:none">
+            <div class="fg"><label>Nome completo</label><input type="text" id="rName" placeholder="João Silva"></div>
+            <div class="fg"><label>E-mail</label><input type="email" id="rEmail" placeholder="seu@email.com"></div>
+            <div class="fg"><label>Senha</label><input type="password" id="rPass" placeholder="Mínimo 6 caracteres"></div>
+            <div class="fg"><label>Perfil</label>
+                <select id="rRole"><option value="condutor">Condutor</option><option value="vistoriador">Vistoriador</option><option value="gestor">Gestor de Frota</option></select>
+            </div>
+            <button class="btn btn-p btn-full btn-lg" onclick="doReg()">Criar Conta</button>
+            <div class="link-btn">Já tem conta? <a onclick="showLog()">Fazer login</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- ====== APP ====== -->
+<div class="app" id="app">
+    <div class="overlay" id="ovl" onclick="toggleSide()"></div>
+
+    <aside class="side" id="side">
+        <div class="side-head">
+            <div class="ico"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+            <span>FleetCheck Pro</span>
+        </div>
+        <nav class="side-nav">
+            <div class="nav-lbl">Principal</div>
+            <div class="ni on" data-pg="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Dashboard</div>
+            <div class="ni" data-pg="new-insp" onclick="go('new-insp')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM9 13h6v2H9v-2zm0 4h6v2H9v-2z"/></svg>Nova Vistoria</div>
+            <div class="ni" data-pg="insps" onclick="go('insps')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm-2 14l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>Vistorias<span class="bdg" id="bdgPend" style="display:none">0</span></div>
+            <div class="nav-lbl">Gestão</div>
+            <div class="ni" data-pg="vehicles" onclick="go('vehicles')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>Veículos</div>
+            <div class="ni" data-pg="approvals" onclick="go('approvals')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>Aprovações<span class="bdg" id="bdgApp" style="display:none">0</span></div>
+            <div class="ni" data-pg="users" id="navUsers" onclick="go('users')" style="display:none"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Usuários</div>
+            <div class="nav-lbl">Relatórios</div>
+            <div class="ni" data-pg="reports" onclick="go('reports')"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>Relatórios</div>
+        </nav>
+        <div class="side-foot">
+            <div class="side-user" onclick="go('profile')">
+                <div class="uav" id="sideAv">AD</div>
+                <div class="udt"><div class="nm" id="sideNm">Admin</div><div class="rl" id="sideRl">Gestor</div></div>
+                <button class="btn btn-g btn-icon" onclick="event.stopPropagation();doLogout()" title="Sair">
+                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-l">
+                <button class="hamburger" onclick="toggleSide()"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+                <h2 id="pgTitle">Dashboard</h2>
+                <span class="device-badge" id="devBadge"></span>
+            </div>
+            <div class="topbar-r">
+                <button class="btn btn-p btn-sm" onclick="go('new-insp')"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Nova Vistoria</button>
+            </div>
+        </div>
+
+        <div class="pg-content">
+
+            <!-- DASHBOARD -->
+            <div class="pv on" id="pg-dashboard">
+                <div class="stats" id="dashStats"></div>
+                <div class="card"><div class="card-h"><h3>Últimas Vistorias</h3><button class="btn btn-o btn-sm" onclick="go('insps')">Ver todas</button></div><div class="card-b" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Data</th><th>Veículo</th><th>Placa</th><th>Condutor</th><th>Status</th></tr></thead><tbody id="dashTbl"></tbody></table></div></div></div>
+                <div class="card"><div class="card-h"><h3>Alertas de Manutenção</h3></div><div class="card-b" id="dashAlerts"><p style="color:var(--gray-500);text-align:center;padding:16px">Nenhum alerta</p></div></div>
+            </div>
+
+            <!-- NEW INSPECTION -->
+            <div class="pv" id="pg-new-insp">
+                <div style="max-width:880px">
+                    <div class="fsec"><div class="fsec-h"><div class="num">1</div><h3>Dados da Inspeção</h3></div><div class="fsec-b">
+                        <div class="fg-row c2">
+                            <div class="fg"><label>Data da Inspeção</label><input type="date" id="iDate"></div>
+                            <div class="fg"><label>Responsável</label><input type="text" id="iResp" readonly></div>
+                        </div>
+                        <div class="fg-row c2">
+                            <div class="fg"><label>Veículo</label><select id="iVeh"><option value="">Selecione...</option></select></div>
+                            <div class="fg"><label>Condutor</label><input type="text" id="iDriver" placeholder="Nome do condutor"></div>
+                        </div>
+                        <div class="fg-row c2">
+                            <div class="fg"><label>KM Atual</label><input type="number" id="iKm" placeholder="0"></div>
+                            <div class="fg"><label>Destino / Obra</label><input type="text" id="iDest" placeholder="Local de destino"></div>
+                        </div>
+                    </div></div>
+
+                    <div class="fsec"><div class="fsec-h"><div class="num">2</div><h3>Itens Essenciais (Sim / Não)</h3></div><div class="fsec-b" style="padding:0"><div id="ckEss"></div></div></div>
+
+                    <div class="fsec"><div class="fsec-h"><div class="num">3</div><h3>Condição dos Componentes</h3></div><div class="fsec-b" style="padding:0"><div id="ckCond"></div></div></div>
+
+                    <div class="fsec"><div class="fsec-h"><div class="num">4</div><h3>Registro Fotográfico</h3></div><div class="fsec-b">
+                        <p style="font-size:13px;color:var(--gray-500);margin-bottom:12px">Clique nos slots para capturar ou selecionar fotos do veículo.</p>
+                        <div class="pgrid" id="iPhotos"></div>
+                    </div></div>
+
+                    <div class="fsec"><div class="fsec-h"><div class="num">5</div><h3>Mapeamento de Avarias</h3></div><div class="fsec-b">
+                        <p style="font-size:13px;color:var(--gray-500);margin-bottom:10px">Clique no veículo para marcar pontos de avaria.</p>
+                        <div class="car-svg-wrap">
+                            <svg id="carSvg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#e0e7ef;stop-opacity:1"/>
+                                        <stop offset="100%" style="stop-color:#c9d1da;stop-opacity:1"/>
+                                    </linearGradient>
+                                    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#a8d4f5;stop-opacity:0.9"/>
+                                        <stop offset="100%" style="stop-color:#7ab8e0;stop-opacity:0.85"/>
+                                    </linearGradient>
+                                    <filter id="carShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/></filter>
+                                </defs>
+                                <rect x="0" y="0" width="600" height="300" fill="#f3f4f6" rx="12"/>
+                                <!-- Car body shadow -->
+                                <ellipse cx="300" cy="260" rx="160" ry="12" fill="rgba(0,0,0,0.08)"/>
+                                <!-- Car body main -->
+                                <path d="M155,65 Q158,45 190,40 L410,40 Q442,45 445,65 L460,85 Q468,92 470,105 L470,195 Q468,208 460,215 L445,235 Q442,255 410,260 L190,260 Q158,255 155,235 L140,215 Q132,208 130,195 L130,105 Q132,92 140,85 Z" fill="url(#bodyGrad)" stroke="#b0b8c4" stroke-width="1.5" filter="url(#carShadow)"/>
+                                <!-- Roof panel lines -->
+                                <path d="M200,105 L400,105" stroke="#b8c0cc" stroke-width="0.8" stroke-dasharray="4,4"/>
+                                <path d="M200,195 L400,195" stroke="#b8c0cc" stroke-width="0.8" stroke-dasharray="4,4"/>
+                                <!-- Windshield front -->
+                                <path d="M195,60 L405,60 Q415,60 412,72 L398,102 L202,102 L188,72 Q185,60 195,60 Z" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="1.2"/>
+                                <!-- Windshield wiper lines -->
+                                <line x1="260" y1="98" x2="230" y2="68" stroke="#8cb8d4" stroke-width="0.6"/>
+                                <line x1="340" y1="98" x2="370" y2="68" stroke="#8cb8d4" stroke-width="0.6"/>
+                                <!-- Rear window -->
+                                <path d="M205,240 L395,240 Q403,240 400,230 L390,203 L210,203 L200,230 Q197,240 205,240 Z" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="1.2"/>
+                                <!-- Side windows left -->
+                                <rect x="133" y="92" width="20" height="32" rx="4" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="0.8"/>
+                                <rect x="133" y="128" width="4" height="6" rx="1" fill="#9aa0a6"/>
+                                <rect x="133" y="168" width="20" height="32" rx="4" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="0.8"/>
+                                <!-- Side windows right -->
+                                <rect x="447" y="92" width="20" height="32" rx="4" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="0.8"/>
+                                <rect x="463" y="128" width="4" height="6" rx="1" fill="#9aa0a6"/>
+                                <rect x="447" y="168" width="20" height="32" rx="4" fill="url(#glassGrad)" stroke="#7ab0d4" stroke-width="0.8"/>
+                                <!-- Door handles -->
+                                <rect x="137" y="140" width="12" height="3" rx="1.5" fill="#9ca3af"/>
+                                <rect x="451" y="140" width="12" height="3" rx="1.5" fill="#9ca3af"/>
+                                <rect x="137" y="158" width="12" height="3" rx="1.5" fill="#9ca3af"/>
+                                <rect x="451" y="158" width="12" height="3" rx="1.5" fill="#9ca3af"/>
+                                <!-- Front wheels -->
+                                <g>
+                                    <rect x="115" y="68" width="28" height="48" rx="8" fill="#3c4043" stroke="#2d3035" stroke-width="1.5"/>
+                                    <rect x="119" y="74" width="20" height="36" rx="5" fill="#5f6368"/>
+                                    <circle cx="129" cy="92" r="6" fill="#4a4e54" stroke="#6b7078" stroke-width="1"/>
+                                    <circle cx="129" cy="92" r="2" fill="#7c8088"/>
+                                    <line x1="129" y1="86" x2="129" y2="98" stroke="#6b7078" stroke-width="0.5"/>
+                                    <line x1="123" y1="92" x2="135" y2="92" stroke="#6b7078" stroke-width="0.5"/>
+                                </g>
+                                <g>
+                                    <rect x="457" y="68" width="28" height="48" rx="8" fill="#3c4043" stroke="#2d3035" stroke-width="1.5"/>
+                                    <rect x="461" y="74" width="20" height="36" rx="5" fill="#5f6368"/>
+                                    <circle cx="471" cy="92" r="6" fill="#4a4e54" stroke="#6b7078" stroke-width="1"/>
+                                    <circle cx="471" cy="92" r="2" fill="#7c8088"/>
+                                    <line x1="471" y1="86" x2="471" y2="98" stroke="#6b7078" stroke-width="0.5"/>
+                                    <line x1="465" y1="92" x2="477" y2="92" stroke="#6b7078" stroke-width="0.5"/>
+                                </g>
+                                <!-- Rear wheels -->
+                                <g>
+                                    <rect x="115" y="185" width="28" height="48" rx="8" fill="#3c4043" stroke="#2d3035" stroke-width="1.5"/>
+                                    <rect x="119" y="191" width="20" height="36" rx="5" fill="#5f6368"/>
+                                    <circle cx="129" cy="209" r="6" fill="#4a4e54" stroke="#6b7078" stroke-width="1"/>
+                                    <circle cx="129" cy="209" r="2" fill="#7c8088"/>
+                                    <line x1="129" y1="203" x2="129" y2="215" stroke="#6b7078" stroke-width="0.5"/>
+                                    <line x1="123" y1="209" x2="135" y2="209" stroke="#6b7078" stroke-width="0.5"/>
+                                </g>
+                                <g>
+                                    <rect x="457" y="185" width="28" height="48" rx="8" fill="#3c4043" stroke="#2d3035" stroke-width="1.5"/>
+                                    <rect x="461" y="191" width="20" height="36" rx="5" fill="#5f6368"/>
+                                    <circle cx="471" cy="209" r="6" fill="#4a4e54" stroke="#6b7078" stroke-width="1"/>
+                                    <circle cx="471" cy="209" r="2" fill="#7c8088"/>
+                                    <line x1="471" y1="203" x2="471" y2="215" stroke="#6b7078" stroke-width="0.5"/>
+                                    <line x1="465" y1="209" x2="477" y2="209" stroke="#6b7078" stroke-width="0.5"/>
+                                </g>
+                                <!-- Headlights -->
+                                <path d="M170,48 Q180,42 195,46 L192,56 Q182,52 175,55 Z" fill="#fff9c4" stroke="#eab308" stroke-width="0.8" opacity="0.9"/>
+                                <path d="M430,48 Q420,42 405,46 L408,56 Q418,52 425,55 Z" fill="#fff9c4" stroke="#eab308" stroke-width="0.8" opacity="0.9"/>
+                                <!-- DRL / fog lights -->
+                                <ellipse cx="178" cy="62" rx="6" ry="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="0.5"/>
+                                <ellipse cx="422" cy="62" rx="6" ry="3" fill="#fef3c7" stroke="#f59e0b" stroke-width="0.5"/>
+                                <!-- Tail lights -->
+                                <path d="M175,250 Q182,258 200,254 L198,244 Q185,247 180,243 Z" fill="#fca5a5" stroke="#ef4444" stroke-width="0.8"/>
+                                <path d="M425,250 Q418,258 400,254 L402,244 Q415,247 420,243 Z" fill="#fca5a5" stroke="#ef4444" stroke-width="0.8"/>
+                                <!-- Turn signals rear -->
+                                <ellipse cx="210" cy="252" rx="5" ry="3" fill="#fed7aa" stroke="#f97316" stroke-width="0.5"/>
+                                <ellipse cx="390" cy="252" rx="5" ry="3" fill="#fed7aa" stroke="#f97316" stroke-width="0.5"/>
+                                <!-- Exhaust -->
+                                <rect x="230" y="262" width="18" height="6" rx="3" fill="#6b7280" stroke="#4b5563" stroke-width="0.5"/>
+                                <!-- License plate areas -->
+                                <rect x="270" y="44" width="60" height="12" rx="2" fill="#fff" stroke="#d1d5db" stroke-width="0.8"/>
+                                <rect x="270" y="250" width="60" height="12" rx="2" fill="#fff" stroke="#d1d5db" stroke-width="0.8"/>
+                                <!-- Side mirrors -->
+                                <ellipse cx="128" cy="80" rx="8" ry="5" fill="#c9d1da" stroke="#9ca3af" stroke-width="0.8"/>
+                                <ellipse cx="472" cy="80" rx="8" ry="5" fill="#c9d1da" stroke="#9ca3af" stroke-width="0.8"/>
+                                <!-- Labels -->
+                                <text x="300" y="22" text-anchor="middle" font-size="11" fill="#9ca3af" font-weight="700">FRENTE</text>
+                                <text x="300" y="290" text-anchor="middle" font-size="11" fill="#9ca3af" font-weight="700">TRASEIRA</text>
+                                <text x="85" y="155" text-anchor="middle" font-size="11" fill="#9ca3af" font-weight="700" transform="rotate(-90,85,155)">ESQUERDA</text>
+                                <text x="520" y="155" text-anchor="middle" font-size="11" fill="#9ca3af" font-weight="700" transform="rotate(90,520,155)">DIREITA</text>
+                                <!-- Damage markers group -->
+                                <g id="dmgG"></g>
+                            </svg>
+                            <div style="margin-top:6px"><button class="btn btn-g btn-sm" onclick="clearDmg()">Limpar marcações</button></div>
+                        </div>
+                        <div class="fg" style="margin-top:12px"><label>Descrição das avarias</label><textarea id="iDmgDesc" placeholder="Descreva as avarias encontradas..."></textarea></div>
+                    </div></div>
+
+                    <div class="fsec"><div class="fsec-h"><div class="num">6</div><h3>Observações Gerais</h3></div><div class="fsec-b"><div class="fg"><textarea id="iObs" placeholder="Observações adicionais..." rows="3"></textarea></div></div></div>
+
+                    <div style="display:flex;gap:10px;justify-content:flex-end;padding-bottom:30px">
+                        <button class="btn btn-o" onclick="go('dashboard')">Cancelar</button>
+                        <button class="btn btn-p btn-lg" onclick="submitInsp()"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Enviar Vistoria</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INSPECTIONS LIST -->
+            <div class="pv" id="pg-insps">
+                <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+                    <button class="btn btn-p btn-sm ftb on" onclick="filtInsp('all',this)">Todas</button>
+                    <button class="btn btn-o btn-sm ftb" onclick="filtInsp('pendente',this)">Pendentes</button>
+                    <button class="btn btn-o btn-sm ftb" onclick="filtInsp('aprovada',this)">Aprovadas</button>
+                    <button class="btn btn-o btn-sm ftb" onclick="filtInsp('reprovada',this)">Reprovadas</button>
+                </div>
+                <div class="card"><div class="card-b" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Data</th><th>Veículo</th><th>Placa</th><th>Condutor</th><th>KM</th><th>Status</th><th>Ações</th></tr></thead><tbody id="inspTbl"></tbody></table></div></div></div>
+            </div>
+
+            <!-- VEHICLES -->
+            <div class="pv" id="pg-vehicles">
+                <div style="display:flex;justify-content:flex-end;margin-bottom:16px"><button class="btn btn-p" onclick="openVehModal()"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Novo Veículo</button></div>
+                <div class="card"><div class="card-b" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Modelo</th><th>Placa</th><th>Ano</th><th>Cor</th><th>RENAVAM</th><th>KM</th><th>Status</th><th>Ações</th></tr></thead><tbody id="vehTbl"></tbody></table></div></div></div>
+            </div>
+
+            <!-- APPROVALS -->
+            <div class="pv" id="pg-approvals">
+                <div class="card"><div class="card-h"><h3>Vistorias Pendentes de Aprovação</h3></div><div class="card-b" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>#</th><th>Data</th><th>Veículo</th><th>Condutor</th><th>Vistoriador</th><th>Ações</th></tr></thead><tbody id="appTbl"></tbody></table></div></div></div>
+            </div>
+
+            <!-- USERS -->
+            <div class="pv" id="pg-users">
+                <div style="display:flex;justify-content:flex-end;margin-bottom:16px"><button class="btn btn-p" onclick="openUserModal()"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Novo Usuário</button></div>
+                <div class="card"><div class="card-b" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usersTbl"></tbody></table></div></div></div>
+            </div>
+
+            <!-- REPORTS -->
+            <div class="pv" id="pg-reports">
+                <div class="stats" style="margin-bottom:20px">
+                    <div class="card" style="margin:0;cursor:pointer" onclick="genReport('fleet')"><div class="card-b" style="text-align:center;padding:28px"><svg viewBox="0 0 24 24" width="36" height="36"><path fill="var(--primary)" d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg><h3 style="font-size:14px;margin-top:8px">Frota</h3></div></div>
+                    <div class="card" style="margin:0;cursor:pointer" onclick="genReport('insps')"><div class="card-b" style="text-align:center;padding:28px"><svg viewBox="0 0 24 24" width="36" height="36"><path fill="var(--success)" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg><h3 style="font-size:14px;margin-top:8px">Vistorias</h3></div></div>
+                    <div class="card" style="margin:0;cursor:pointer" onclick="genReport('maint')"><div class="card-b" style="text-align:center;padding:28px"><svg viewBox="0 0 24 24" width="36" height="36"><path fill="var(--warning)" d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg><h3 style="font-size:14px;margin-top:8px">Manutenção</h3></div></div>
+                </div>
+                <div class="card" id="rptOut" style="display:none"><div class="card-h"><h3 id="rptTitle">Relatório</h3><button class="btn btn-o btn-sm" onclick="window.print()">Imprimir</button></div><div class="card-b" id="rptBody"></div></div>
+            </div>
+
+            <!-- PROFILE -->
+            <div class="pv" id="pg-profile">
+                <div style="max-width:500px;margin:0 auto">
+                    <div class="card"><div class="card-h"><h3>Meu Perfil</h3></div><div class="card-b" style="text-align:center">
+                        <div class="profile-avatar-wrap" id="profAvWrap" onclick="document.getElementById('profAvIn').click()">
+                            <span class="pav-txt" id="profAvTxt">AD</span>
+                            <div class="pav-ov"><svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9z"/></svg></div>
+                        </div>
+                        <input type="file" id="profAvIn" accept="image/*" style="display:none">
+                        <div class="fg" style="text-align:left"><label>Nome</label><input type="text" id="profName"></div>
+                        <div class="fg" style="text-align:left"><label>E-mail</label><input type="email" id="profEmail" readonly style="background:var(--gray-50)"></div>
+                        <div class="fg" style="text-align:left"><label>Função/Cargo</label><input type="text" id="profFunc" placeholder="Ex: Motorista, Encarregado..."></div>
+                        <div class="fg" style="text-align:left"><label>Perfil</label><select id="profRole" disabled><option value="condutor">Condutor</option><option value="vistoriador">Vistoriador</option><option value="gestor">Gestor de Frota</option></select></div>
+                        <div class="fg" style="text-align:left"><label>Nova Senha (deixe vazio para manter)</label><input type="password" id="profPass" placeholder="******"></div>
+                        <button class="btn btn-p btn-full" onclick="saveProfile()">Salvar Perfil</button>
+                    </div></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- MODALS -->
+
+<!-- Vehicle Modal (add/edit) -->
+<div class="modal-ov" id="mVeh">
+    <div class="modal modal-lg">
+        <div class="m-h"><h3 id="mVehTitle">Cadastrar Veículo</h3><button class="m-x" onclick="closeM('mVeh')">&times;</button></div>
+        <div class="m-b">
+            <div class="fg-row c3">
+                <div class="fg"><label>Modelo *</label><input type="text" id="vModel" placeholder="Fiat Strada"></div>
+                <div class="fg"><label>Marca</label><input type="text" id="vBrand" placeholder="Fiat"></div>
+                <div class="fg"><label>Ano *</label><input type="number" id="vYear" placeholder="2024"></div>
+            </div>
+            <div class="fg-row c3">
+                <div class="fg"><label>Placa *</label><input type="text" id="vPlate" placeholder="ABC-1D23" style="text-transform:uppercase"></div>
+                <div class="fg"><label>Cor</label><input type="text" id="vColor" placeholder="Branco"></div>
+                <div class="fg"><label>Tipo</label><select id="vType"><option value="leve">Leve</option><option value="utilitario">Utilitário</option><option value="caminhonete">Caminhonete</option><option value="van">Van</option></select></div>
+            </div>
+            <div class="fg-row c3">
+                <div class="fg"><label>RENAVAM</label><input type="text" id="vRenavam" placeholder="00000000000"></div>
+                <div class="fg"><label>Chassi</label><input type="text" id="vChassi" placeholder="9BXXXXXXXXXXXXXXX"></div>
+                <div class="fg"><label>KM Atual</label><input type="number" id="vKm" placeholder="0"></div>
+            </div>
+            <div class="fg-row c2">
+                <div class="fg"><label>Combustível</label><select id="vFuel"><option value="flex">Flex</option><option value="gasolina">Gasolina</option><option value="diesel">Diesel</option><option value="eletrico">Elétrico</option></select></div>
+                <div class="fg"><label>Venc. Seguro</label><input type="date" id="vInsurance"></div>
+            </div>
+            <div class="fg"><label>Observações</label><textarea id="vNotes" placeholder="Informações adicionais do veículo..."></textarea></div>
+            <div class="fg"><label>Fotos do Veículo (clique para adicionar)</label>
+                <div class="pgrid" id="vPhGrid"></div>
+            </div>
+            <hr style="border:0;border-top:1px solid var(--gray-200);margin:16px 0">
+            <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">Checklist Inicial do Veículo</h4>
+            <div id="vCkInit"></div>
+        </div>
+        <div class="m-f">
+            <input type="hidden" id="vEditId" value="">
+            <button class="btn btn-g" onclick="closeM('mVeh')">Cancelar</button>
+            <button class="btn btn-p" onclick="saveVeh()">Salvar Veículo</button>
+        </div>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal-ov" id="mUser">
+    <div class="modal modal-sm">
+        <div class="m-h"><h3>Novo Usuário</h3><button class="m-x" onclick="closeM('mUser')">&times;</button></div>
+        <div class="m-b">
+            <div class="fg"><label>Nome completo</label><input type="text" id="nuName"></div>
+            <div class="fg"><label>E-mail</label><input type="email" id="nuEmail"></div>
+            <div class="fg"><label>Senha</label><input type="password" id="nuPass" placeholder="Mínimo 6 caracteres"></div>
+            <div class="fg"><label>Perfil</label><select id="nuRole"><option value="condutor">Condutor</option><option value="vistoriador">Vistoriador</option><option value="gestor">Gestor de Frota</option></select></div>
+        </div>
+        <div class="m-f"><button class="btn btn-g" onclick="closeM('mUser')">Cancelar</button><button class="btn btn-p" onclick="saveNewUser()">Salvar</button></div>
+    </div>
+</div>
+
+<!-- Inspection Detail Modal -->
+<div class="modal-ov" id="mInsp">
+    <div class="modal modal-xl">
+        <div class="m-h"><h3>Detalhes da Vistoria</h3><button class="m-x" onclick="closeM('mInsp')">&times;</button></div>
+        <div class="m-b" id="mInspBody"></div>
+        <div class="m-f" id="mInspFoot"></div>
+    </div>
+</div>
+
+<!-- Vehicle Detail Modal -->
+<div class="modal-ov" id="mVehDetail">
+    <div class="modal modal-lg">
+        <div class="m-h"><h3>Detalhes do Veículo</h3><button class="m-x" onclick="closeM('mVehDetail')">&times;</button></div>
+        <div class="m-b" id="mVehDetailBody"></div>
+        <div class="m-f"><button class="btn btn-g" onclick="closeM('mVehDetail')">Fechar</button></div>
+    </div>
+</div>
+
+<!-- Photo Viewer -->
+<div class="modal-ov" id="mPhoto" onclick="closeM('mPhoto')">
+    <div style="max-width:92vw;max-height:92dvh"><img id="mPhotoImg" style="max-width:100%;max-height:90dvh;border-radius:10px;box-shadow:var(--shadow-lg)"></div>
+</div>
+
+<!-- Print area -->
+<div class="print-area" id="printArea"></div>
+
+<!-- Hidden inputs -->
+<input type="file" id="photoIn" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="vPhotoIn" accept="image/*" capture="environment" style="display:none">
+
+<script>
+// ============================================================
+// STORAGE
+// ============================================================
+const K = { U: 'fc_u', V: 'fc_v', I: 'fc_i', S: 'fc_s' };
+const g = k => { try { return JSON.parse(localStorage.getItem(k)) || []; } catch { return []; } };
+const s = (k, d) => localStorage.setItem(k, JSON.stringify(d));
+const gS = () => { try { return JSON.parse(localStorage.getItem(K.S)); } catch { return null; } };
+const sS = u => localStorage.setItem(K.S, JSON.stringify(u));
+const cS = () => localStorage.removeItem(K.S);
+
+// ============================================================
+// DETECT DEVICE
+// ============================================================
+function detectDevice() {
+    const ua = navigator.userAgent;
+    const w = window.innerWidth;
+    let type = 'Desktop';
+    if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua) || w <= 480) type = 'Mobile';
+    else if (/iPad|Tablet/i.test(ua) || (w > 480 && w <= 1024)) type = 'Tablet';
+    document.getElementById('devBadge').innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="${type === 'Mobile' ? 'M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm-2 20h-4v-1h4v1zm3.25-3H6.75V4h10.5v14z' : type === 'Tablet' ? 'M18.5 0h-14A2.5 2.5 0 0 0 2 2.5v19A2.5 2.5 0 0 0 4.5 24h14a2.5 2.5 0 0 0 2.5-2.5v-19A2.5 2.5 0 0 0 18.5 0zm-7 23c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm7.5-4H4V3h15v16z' : 'M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z'}"
+    /></svg>${type}`;
+    document.body.dataset.device = type.toLowerCase();
+    return type.toLowerCase();
+}
+window.addEventListener('resize', detectDevice);
+
+// ============================================================
+// INIT DATA
+// ============================================================
+function initData() {
+    if (!g(K.U).length) s(K.U, [
+        { id: 1, name: 'Admin Master', email: 'admin@fleet.com', password: 'admin123', role: 'gestor', active: true, avatar: '', func: 'Gestor Operacional' },
+        { id: 2, name: 'Carlos Silva', email: 'carlos@fleet.com', password: '123456', role: 'vistoriador', active: true, avatar: '', func: 'Técnico de Frota' },
+        { id: 3, name: 'Maria Santos', email: 'maria@fleet.com', password: '123456', role: 'condutor', active: true, avatar: '', func: 'Motorista' }
+    ]);
+    if (!g(K.V).length) s(K.V, [
+        { id: 1, model:'Fiat Strada Freedom', brand:'Fiat', plate:'ABC-1D23', year:2023, color:'Branco', km:45200, type:'utilitario', renavam:'12345678901', chassi:'9BF12345678901234', fuel:'flex', insurance:'2026-08-15', notes:'', photos:{}, initialCheck:{}, active:true },
+        { id: 2, model:'VW Gol 1.0', brand:'Volkswagen', plate:'DEF-4G56', year:2022, color:'Prata', km:62300, type:'leve', renavam:'', chassi:'', fuel:'flex', insurance:'', notes:'', photos:{}, initialCheck:{}, active:true },
+        { id: 3, model:'Chevrolet S10 LT', brand:'Chevrolet', plate:'GHI-7H89', year:2024, color:'Cinza', km:12800, type:'caminhonete', renavam:'', chassi:'', fuel:'diesel', insurance:'', notes:'', photos:{}, initialCheck:{}, active:true }
+    ]);
+}
+initData();
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+const essItems = ['Documentos do carro','Encostos de Cabeça','Limpador de para-brisas','Cintos de segurança','Vidros','Macaco, chave de roda e triângulo','Limpeza do veículo'];
+const condItems = ['Alarme','Calotas','Farol de cidade','Farol alto','Luz de seta dianteira','Luz de seta traseira','Luz de freio','Nível do óleo do motor','Nível da água','Pressão dos pneus','Retrovisores','Freio de estacionamento','Combustível','Filtro de óleo','Filtro de ar','Amortecedores','Bancos','Tapetes','Água do limpador','Óleo de freio','Óleo do motor','Pneus'];
+const photoLbls = ['Frente','Traseira','Lat. Esquerda','Lat. Direita','Painel/KM','Interior','Pneu DE','Pneu DD','Pneu TE','Pneu TD','Motor','Avaria'];
+const vehPhotoLbls = ['Frente','Traseira','Lat. Esq.','Lat. Dir.','Interior','Motor'];
+const roleLbl = { condutor:'Condutor', vistoriador:'Vistoriador', gestor:'Gestor de Frota' };
+
+// ============================================================
+// STATE
+// ============================================================
+let me = null, curSlot = null, iPhotos = {}, dmgPts = [], filt = 'all';
+let vPhotos = {}, vCurSlot = null;
+
+// ============================================================
+// AUTH
+// ============================================================
+function showLog() { document.getElementById('frmLogin').style.display='block'; document.getElementById('frmReg').style.display='none'; }
+function showReg() { document.getElementById('frmLogin').style.display='none'; document.getElementById('frmReg').style.display='block'; }
+
+function doLogin() {
+    const e = document.getElementById('lEmail').value.trim(), p = document.getElementById('lPass').value;
+    if (!e||!p) return toast('Preencha todos os campos','err');
+    const u = g(K.U).find(u => u.email===e && u.password===p);
+    if (!u) return toast('E-mail ou senha incorretos','err');
+    if (!u.active) return toast('Usuário desativado','err');
+    me = u; sS(u); enter();
+}
+
+function doReg() {
+    const n = document.getElementById('rName').value.trim(), e = document.getElementById('rEmail').value.trim();
+    const p = document.getElementById('rPass').value, r = document.getElementById('rRole').value;
+    if (!n||!e||!p) return toast('Preencha todos os campos','err');
+    if (p.length < 6) return toast('Senha mínima: 6 caracteres','err');
+    const us = g(K.U);
+    if (us.find(u=>u.email===e)) return toast('E-mail já cadastrado','err');
+    const nu = { id: Date.now(), name:n, email:e, password:p, role:r, active:true, avatar:'', func:'' };
+    us.push(nu); s(K.U, us); me = nu; sS(nu); toast('Conta criada!','suc'); enter();
+}
+
+function doLogout() { me = null; cS(); document.getElementById('app').classList.remove('on'); document.getElementById('loginScreen').style.display='flex'; showLog(); }
+
+function enter() {
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.add('on');
+    updSideUser();
+    document.getElementById('navUsers').style.display = me.role==='gestor' ? 'flex' : 'none';
+    go('dashboard');
+    buildInspForm();
+    detectDevice();
+}
+
+function updSideUser() {
+    document.getElementById('sideNm').textContent = me.name;
+    document.getElementById('sideRl').textContent = me.func || roleLbl[me.role] || me.role;
+    const av = document.getElementById('sideAv');
+    if (me.avatar) av.innerHTML = `<img src="${me.avatar}">`; else av.textContent = me.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+}
+
+(function() { const ss = gS(); if (ss) { const u = g(K.U).find(x=>x.id===ss.id); if (u&&u.active) { me = u; enter(); } } })();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function go(pg) {
+    document.querySelectorAll('.pv').forEach(p=>p.classList.remove('on'));
+    const el = document.getElementById('pg-'+pg); if (el) el.classList.add('on');
+    document.querySelectorAll('.ni').forEach(n=>{ n.classList.toggle('on', n.dataset.pg===pg); });
+    const titles = { dashboard:'Dashboard','new-insp':'Nova Vistoria', insps:'Vistorias', vehicles:'Veículos', approvals:'Aprovações', users:'Usuários', reports:'Relatórios', profile:'Meu Perfil' };
+    document.getElementById('pgTitle').textContent = titles[pg]||'FleetCheck';
+    switch(pg) {
+        case 'dashboard': renderDash(); break;
+        case 'insps': renderInsps(); break;
+        case 'vehicles': renderVehs(); break;
+        case 'approvals': renderApps(); break;
+        case 'users': renderUsers(); break;
+        case 'new-insp': resetInspForm(); break;
+        case 'profile': loadProfile(); break;
+    }
+    document.getElementById('side').classList.remove('open');
+    document.getElementById('ovl').classList.remove('on');
+}
+
+function toggleSide() { document.getElementById('side').classList.toggle('open'); document.getElementById('ovl').classList.toggle('on'); }
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash() {
+    const vs = g(K.V).filter(v=>v.active), is = g(K.I);
+    const pend = is.filter(i=>i.status==='pendente').length;
+    const appr = is.filter(i=>i.status==='aprovada').length;
+    const rej = is.filter(i=>i.status==='reprovada').length;
+
+    document.getElementById('bdgPend').style.display = pend?'inline':'none'; document.getElementById('bdgPend').textContent = pend;
+    document.getElementById('bdgApp').style.display = pend?'inline':'none'; document.getElementById('bdgApp').textContent = pend;
+
+    document.getElementById('dashStats').innerHTML = `
+        <div class="stat"><div class="stat-i bl"><svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/></svg></div><div class="stat-d"><h3>${vs.length}</h3><p>Veículos Ativos</p></div></div>
+        <div class="stat"><div class="stat-i or"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div><div class="stat-d"><h3>${pend}</h3><p>Pendentes</p></div></div>
+        <div class="stat"><div class="stat-i gn"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></div><div class="stat-d"><h3>${appr}</h3><p>Aprovadas</p></div></div>
+        <div class="stat"><div class="stat-i rd"><svg viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></div><div class="stat-d"><h3>${rej}</h3><p>Reprovadas</p></div></div>
+    `;
+
+    const vm = {}; g(K.V).forEach(v=>vm[v.id]=v);
+    const rec = [...is].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+    document.getElementById('dashTbl').innerHTML = rec.length ? rec.map(i=>{
+        const v = vm[i.vehicleId]||{};
+        return `<tr><td>${fmtD(i.date)}</td><td>${v.model||'-'}</td><td><b>${v.plate||'-'}</b></td><td>${i.driver}</td><td>${stBdg(i.status)}</td></tr>`;
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma vistoria</td></tr>';
+
+    // Alerts
+    const alerts = [];
+    is.forEach(i=>{ if(i.conditions) Object.entries(i.conditions).forEach(([it,val])=>{ if(val==='ruim') alerts.push({ v: `${(vm[i.vehicleId]||{}).model||''} (${(vm[i.vehicleId]||{}).plate||''})`, it, d: i.date }); }); });
+    document.getElementById('dashAlerts').innerHTML = alerts.length ? alerts.slice(0,8).map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray-100)"><div style="width:7px;height:7px;border-radius:50%;background:var(--danger);flex-shrink:0"></div><div style="flex:1"><b style="font-size:13px">${a.it}</b> <span style="color:var(--gray-500);font-size:12px">- ${a.v}</span></div><span style="font-size:11px;color:var(--gray-400)">${fmtD(a.d)}</span></div>`).join('') : '<p style="color:var(--gray-400);text-align:center;padding:16px">Nenhum alerta</p>';
+}
+
+// ============================================================
+// INSPECTION FORM
+// ============================================================
+function buildInspForm() {
+    // Essential
+    document.getElementById('ckEss').innerHTML = essItems.map((it,i)=>`<div class="cli"><span class="cn">${it}</span><div class="tg"><button class="y" data-e="${i}" data-v="sim" onclick="tgE(this)">Sim</button><button class="n" data-e="${i}" data-v="nao" onclick="tgE(this)">Não</button></div></div>`).join('');
+
+    // Condition
+    document.getElementById('ckCond').innerHTML = condItems.map((it,i)=>`<div class="cli"><span class="cn">${it}</span><div class="tg"><button class="cr" data-c="${i}" data-v="ruim" onclick="tgC(this)">Ruim</button><button class="cm" data-c="${i}" data-v="media" onclick="tgC(this)">Média</button><button class="cb" data-c="${i}" data-v="boa" onclick="tgC(this)">Boa</button></div></div>`).join('');
+
+    // Photos
+    document.getElementById('iPhotos').innerHTML = photoLbls.map((l,i)=>`<div class="pslot" id="ps${i}" onclick="trigPh(${i})"><svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9z"/></svg><span>${l}</span><button class="xp" onclick="event.stopPropagation();rmPh(${i})">&times;</button></div>`).join('');
+
+    popVehSel();
+
+    // Car diagram click
+    document.getElementById('carSvg').addEventListener('click', function(e) {
+        const r = this.getBoundingClientRect(), vb = this.viewBox.baseVal;
+        const x = ((e.clientX-r.left)/r.width)*vb.width, y = ((e.clientY-r.top)/r.height)*vb.height;
+        dmgPts.push({x,y}); renderDmg();
+    });
+}
+
+function popVehSel() {
+    const vs = g(K.V).filter(v=>v.active);
+    document.getElementById('iVeh').innerHTML = '<option value="">Selecione...</option>' + vs.map(v=>`<option value="${v.id}">${v.model} - ${v.plate}</option>`).join('');
+}
+
+function resetInspForm() {
+    document.getElementById('iDate').value = new Date().toISOString().split('T')[0];
+    if (me) document.getElementById('iResp').value = me.name;
+    ['iVeh','iDriver','iKm','iDest','iDmgDesc','iObs'].forEach(id=>{ const el=document.getElementById(id); if(el.tagName==='SELECT') el.value=''; else el.value=''; });
+    document.querySelectorAll('#ckEss .tg button, #ckCond .tg button').forEach(b=>b.classList.remove('on'));
+    iPhotos = {}; photoLbls.forEach((_,i)=>{ const sl=document.getElementById('ps'+i); const im=sl.querySelector('img'); if(im)im.remove(); sl.classList.remove('has'); });
+    dmgPts = []; renderDmg(); popVehSel();
+}
+
+function tgE(b) { document.querySelectorAll(`[data-e="${b.dataset.e}"]`).forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
+function tgC(b) { document.querySelectorAll(`[data-c="${b.dataset.c}"]`).forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
+
+// Photos
+function trigPh(i) { curSlot = i; document.getElementById('photoIn').click(); }
+document.getElementById('photoIn').addEventListener('change', function(e) {
+    if (e.target.files[0] && curSlot !== null) {
+        const r = new FileReader();
+        r.onload = ev => {
+            iPhotos[curSlot] = ev.target.result;
+            const sl = document.getElementById('ps'+curSlot);
+            let im = sl.querySelector('img'); if (!im) { im = document.createElement('img'); sl.appendChild(im); }
+            im.src = ev.target.result; sl.classList.add('has');
+        };
+        r.readAsDataURL(e.target.files[0]);
+    }
+    e.target.value = '';
+});
+function rmPh(i) { delete iPhotos[i]; const sl=document.getElementById('ps'+i); const im=sl.querySelector('img'); if(im)im.remove(); sl.classList.remove('has'); }
+
+// Damage
+function renderDmg() {
+    document.getElementById('dmgG').innerHTML = dmgPts.map((p,i)=>`<g class="damage-marker" onclick="event.stopPropagation();rmDmg(${i})" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="13" fill="#dc2626" opacity="0.85" stroke="#fff" stroke-width="2"/><text x="${p.x}" y="${p.y+1}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="10" font-weight="bold">${i+1}</text></g>`).join('');
+}
+function rmDmg(i) { dmgPts.splice(i,1); renderDmg(); }
+function clearDmg() { dmgPts = []; renderDmg(); }
+
+function submitInsp() {
+    const date = document.getElementById('iDate').value, resp = document.getElementById('iResp').value;
+    const vehId = document.getElementById('iVeh').value, driver = document.getElementById('iDriver').value.trim();
+    const km = parseInt(document.getElementById('iKm').value)||0;
+    if (!date||!resp||!vehId||!driver) return toast('Preencha: Data, Veículo e Condutor','err');
+
+    const ess = {}; essItems.forEach((it,i)=>{ const a=document.querySelector(`[data-e="${i}"].on`); ess[it]=a?a.dataset.v:'n/a'; });
+    const cond = {}; condItems.forEach((it,i)=>{ const a=document.querySelector(`[data-c="${i}"].on`); cond[it]=a?a.dataset.v:'n/a'; });
+
+    const insp = {
+        id: Date.now(), date, responsible: resp, vehicleId: parseInt(vehId), driver,
+        km, dest: document.getElementById('iDest').value.trim(),
+        essentials: ess, conditions: cond,
+        photos: {...iPhotos}, damagePoints: [...dmgPts],
+        damageDesc: document.getElementById('iDmgDesc').value.trim(),
+        observations: document.getElementById('iObs').value.trim(),
+        status: 'pendente', createdBy: me.id, createdAt: new Date().toISOString(),
+        approvedBy: null, approvalDate: null, approvalNotes: ''
+    };
+
+    const is = g(K.I); is.push(insp); s(K.I, is);
+
+    // Update vehicle km
+    if (km > 0) { const vs = g(K.V); const vi = vs.findIndex(v=>v.id===parseInt(vehId)); if (vi>=0 && km>vs[vi].km) { vs[vi].km=km; s(K.V,vs); } }
+
+    toast('Vistoria registrada!','suc'); go('insps');
+}
+
+// ============================================================
+// INSPECTIONS LIST
+// ============================================================
+function renderInsps() {
+    const is = g(K.I), vm = {}; g(K.V).forEach(v=>vm[v.id]=v);
+    let fi = filt==='all' ? [...is] : is.filter(i=>i.status===filt);
+    fi.sort((a,b)=>new Date(b.date)-new Date(a.date));
+    document.getElementById('inspTbl').innerHTML = fi.length ? fi.map(i=>{
+        const v=vm[i.vehicleId]||{};
+        return `<tr><td><b>#${String(i.id).slice(-5)}</b></td><td>${fmtD(i.date)}</td><td>${v.model||'-'}</td><td><b>${v.plate||'-'}</b></td><td>${i.driver}</td><td>${i.km?i.km.toLocaleString():'-'}</td><td>${stBdg(i.status)}</td><td><div class="acts"><button class="btn btn-o btn-xs" onclick="viewInsp(${i.id})">Ver</button><button class="btn btn-p btn-xs" onclick="printInsp(${i.id})">PDF</button><button class="btn btn-d btn-xs" onclick="delInsp(${i.id})">Excluir</button></div></td></tr>`;
+    }).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma vistoria</td></tr>';
+}
+
+function filtInsp(f, btn) { filt=f; document.querySelectorAll('.ftb').forEach(b=>{b.classList.remove('btn-p');b.classList.add('btn-o');b.classList.remove('on');}); btn.classList.add('btn-p');btn.classList.remove('btn-o');btn.classList.add('on'); renderInsps(); }
+
+function viewInsp(id) {
+    const is = g(K.I), i = is.find(x=>x.id===id); if(!i) return;
+    const vm = {}; g(K.V).forEach(v=>vm[v.id]=v); const v = vm[i.vehicleId]||{};
+    const um = {}; g(K.U).forEach(u=>um[u.id]=u); const approver = um[i.approvedBy];
+
+    let h = `<div class="dtg">
+        <div class="dti"><label>Data</label><p>${fmtD(i.date)}</p></div>
+        <div class="dti"><label>Veículo</label><p>${v.model||'-'}</p></div>
+        <div class="dti"><label>Placa</label><p>${v.plate||'-'}</p></div>
+        <div class="dti"><label>Condutor</label><p>${i.driver}</p></div>
+        <div class="dti"><label>Vistoriador</label><p>${i.responsible}</p></div>
+        <div class="dti"><label>KM Atual</label><p>${i.km?i.km.toLocaleString():'-'}</p></div>
+        <div class="dti"><label>Destino</label><p>${i.dest||'-'}</p></div>
+        <div class="dti"><label>Status</label><p>${stBdg(i.status)}</p></div>
+    </div>`;
+
+    if (approver) { h += `<div class="dtg"><div class="dti"><label>Avaliado por</label><p>${approver.name}</p></div><div class="dti"><label>Data</label><p>${fmtD(i.approvalDate)}</p></div></div>`; if(i.approvalNotes) h += `<div style="padding:10px 14px;background:var(--gray-50);border-radius:8px;font-size:13px;margin-bottom:12px"><b>Obs:</b> ${i.approvalNotes}</div>`; }
+
+    h += '<h4 style="font-size:14px;margin:14px 0 8px">Itens Essenciais</h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">';
+    if(i.essentials) Object.entries(i.essentials).forEach(([k,val])=>{ const c=val==='sim'?'var(--success)':val==='nao'?'var(--danger)':'var(--gray-400)'; const l=val==='sim'?'Sim':val==='nao'?'Não':'N/A'; h+=`<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--gray-50);border-radius:5px;font-size:12px"><span>${k}</span><b style="color:${c}">${l}</b></div>`; });
+    h += '</div>';
+
+    h += '<h4 style="font-size:14px;margin:14px 0 8px">Condição dos Componentes</h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">';
+    if(i.conditions) Object.entries(i.conditions).forEach(([k,val])=>{ const cls=val==='boa'?'cond-b':val==='media'?'cond-m':val==='ruim'?'cond-r':''; const l=val==='boa'?'Boa':val==='media'?'Média':val==='ruim'?'Ruim':'N/A'; h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--gray-50);border-radius:5px;font-size:12px"><span>${k}</span><span class="cond ${cls}">${l}</span></div>`; });
+    h += '</div>';
+
+    if(i.photos && Object.keys(i.photos).length) { h += '<h4 style="font-size:14px;margin:14px 0 8px">Fotos</h4><div class="pgal">'; Object.entries(i.photos).forEach(([idx,src])=>{ h+=`<img src="${src}" onclick="viewPh('${src.substring(0,50)}')" title="${photoLbls[idx]||'Foto'}" data-full="${idx}">`; }); h+='</div>'; }
+    if(i.damageDesc) h+=`<h4 style="font-size:14px;margin:14px 0 8px">Avarias</h4><p style="padding:10px 14px;background:var(--danger-light);border-radius:8px;font-size:13px;color:var(--danger)">${i.damageDesc}</p>`;
+    if(i.observations) h+=`<h4 style="font-size:14px;margin:14px 0 8px">Observações</h4><p style="padding:10px 14px;background:var(--gray-50);border-radius:8px;font-size:13px">${i.observations}</p>`;
+
+    document.getElementById('mInspBody').innerHTML = h;
+
+    // Bind photo clicks properly
+    document.querySelectorAll('#mInspBody .pgal img').forEach(img => {
+        const idx = img.dataset.full;
+        img.onclick = () => viewPh(i.photos[idx]);
+    });
+
+    let foot = '';
+    if (i.status==='pendente' && (me.role==='gestor'||me.role==='vistoriador')) {
+        foot = `<div style="flex:1"><input type="text" id="appNotes" placeholder="Observações..." style="width:100%;padding:9px 12px;border:2px solid var(--gray-200);border-radius:7px;font-size:13px;font-family:inherit"></div><button class="btn btn-d" onclick="doApprove(${i.id},'reprovada')">Reprovar</button><button class="btn btn-s" onclick="doApprove(${i.id},'aprovada')">Aprovar</button>`;
+    }
+    foot += `<button class="btn btn-p btn-sm" onclick="printInsp(${i.id})">Imprimir PDF</button>`;
+    document.getElementById('mInspFoot').innerHTML = foot;
+    openM('mInsp');
+}
+
+function doApprove(id, st) {
+    const is = g(K.I), idx = is.findIndex(i=>i.id===id); if(idx<0) return;
+    is[idx].status = st; is[idx].approvedBy = me.id; is[idx].approvalDate = new Date().toISOString().split('T')[0];
+    is[idx].approvalNotes = document.getElementById('appNotes')?.value||'';
+    s(K.I, is); closeM('mInsp'); toast(st==='aprovada'?'Aprovada!':'Reprovada!', st==='aprovada'?'suc':'wrn');
+    renderInsps(); renderDash(); renderApps();
+}
+
+function delInsp(id) { if(!confirm('Excluir vistoria?')) return; s(K.I, g(K.I).filter(i=>i.id!==id)); toast('Excluída','inf'); renderInsps(); }
+
+// ============================================================
+// PRINT / PDF
+// ============================================================
+function printInsp(id) {
+    const is = g(K.I), i = is.find(x=>x.id===id); if(!i) return;
+    const vm = {}; g(K.V).forEach(v=>vm[v.id]=v); const v = vm[i.vehicleId]||{};
+
+    let h = `<h1>Vistoria Veicular - FleetCheck Pro</h1>
+    <p style="color:#666;font-size:12px;margin-bottom:12px">Documento gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+    <hr style="border:0;border-top:2px solid #2563eb;margin-bottom:12px">
+    <h2>Dados da Inspeção</h2>
+    <table><tr><td><b>Data:</b> ${fmtD(i.date)}</td><td><b>Veículo:</b> ${v.model||'-'}</td><td><b>Placa:</b> ${v.plate||'-'}</td></tr>
+    <tr><td><b>Condutor:</b> ${i.driver}</td><td><b>Vistoriador:</b> ${i.responsible}</td><td><b>KM:</b> ${i.km?i.km.toLocaleString():'-'}</td></tr>
+    <tr><td><b>Status:</b> ${i.status.toUpperCase()}</td><td><b>Destino:</b> ${i.dest||'-'}</td><td></td></tr></table>
+
+    <h2>Itens Essenciais</h2><table><thead><tr><th>Item</th><th>Atende?</th></tr></thead><tbody>`;
+    if(i.essentials) Object.entries(i.essentials).forEach(([k,val])=>{ h+=`<tr><td>${k}</td><td style="color:${val==='sim'?'green':'red'}">${val==='sim'?'SIM':val==='nao'?'NÃO':'N/A'}</td></tr>`; });
+    h += `</tbody></table>
+
+    <h2>Condição dos Componentes</h2><table><thead><tr><th>Item</th><th>Condição</th></tr></thead><tbody>`;
+    if(i.conditions) Object.entries(i.conditions).forEach(([k,val])=>{ h+=`<tr><td>${k}</td><td style="color:${val==='boa'?'green':val==='media'?'orange':'red'}">${val==='boa'?'BOA':val==='media'?'MÉDIA':val==='ruim'?'RUIM':'N/A'}</td></tr>`; });
+    h += '</tbody></table>';
+
+    if(i.damageDesc) h+=`<h2>Avarias</h2><p>${i.damageDesc}</p>`;
+    if(i.observations) h+=`<h2>Observações</h2><p>${i.observations}</p>`;
+
+    if(i.photos && Object.keys(i.photos).length) {
+        h+='<h2>Registro Fotográfico</h2><div class="pi-photos">';
+        Object.entries(i.photos).forEach(([idx,src])=>{ h+=`<img src="${src}" style="width:120px;height:90px;object-fit:cover;margin:3px;border:1px solid #ccc;border-radius:4px">`; });
+        h+='</div>';
+    }
+
+    h += `<div style="margin-top:40px;display:flex;justify-content:space-between"><div style="border-top:1px solid #000;width:200px;text-align:center;padding-top:4px;font-size:12px">Assinatura do Condutor</div><div style="border-top:1px solid #000;width:200px;text-align:center;padding-top:4px;font-size:12px">Assinatura do Vistoriador</div></div>`;
+
+    document.getElementById('printArea').innerHTML = h;
+    closeM('mInsp');
+    setTimeout(()=>window.print(), 300);
+}
+
+// ============================================================
+// APPROVALS
+// ============================================================
+function renderApps() {
+    const is = g(K.I).filter(i=>i.status==='pendente'), vm = {}; g(K.V).forEach(v=>vm[v.id]=v);
+    document.getElementById('appTbl').innerHTML = is.length ? is.map(i=>{
+        const v=vm[i.vehicleId]||{};
+        return `<tr><td><b>#${String(i.id).slice(-5)}</b></td><td>${fmtD(i.date)}</td><td>${v.model||'-'} (${v.plate||''})</td><td>${i.driver}</td><td>${i.responsible}</td><td><button class="btn btn-p btn-xs" onclick="viewInsp(${i.id})">Revisar</button></td></tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--gray-400);padding:32px">Nenhuma pendente</td></tr>';
+}
+
+// ============================================================
+// VEHICLES
+// ============================================================
+function renderVehs() {
+    const vs = g(K.V);
+    document.getElementById('vehTbl').innerHTML = vs.length ? vs.map(v=>`
+        <tr style="${v.active?'':'opacity:.5'}"><td><b>${v.model}</b><br><span style="font-size:11px;color:var(--gray-500)">${v.brand||''}</span></td><td><b>${v.plate}</b></td><td>${v.year||'-'}</td><td>${v.color||'-'}</td><td style="font-size:11px">${v.renavam||'-'}</td><td>${v.km?v.km.toLocaleString()+' km':'-'}</td><td>${v.active?'<span class="st st-ok"><span class="st-dot"></span>Ativo</span>':'<span class="st st-fail"><span class="st-dot"></span>Inativo</span>'}</td><td><div class="acts"><button class="btn btn-o btn-xs" onclick="viewVeh(${v.id})">Ver</button><button class="btn btn-p btn-xs" onclick="editVeh(${v.id})">Editar</button><button class="btn btn-xs ${v.active?'btn-w':'btn-s'}" onclick="tgVeh(${v.id})">${v.active?'Desativar':'Ativar'}</button></div></td></tr>
+    `).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--gray-400);padding:32px">Nenhum veículo</td></tr>';
+}
+
+function openVehModal(editId) {
+    document.getElementById('mVehTitle').textContent = editId ? 'Editar Veículo' : 'Cadastrar Veículo';
+    document.getElementById('vEditId').value = editId || '';
+    vPhotos = {};
+
+    // Vehicle photos
+    document.getElementById('vPhGrid').innerHTML = vehPhotoLbls.map((l,i)=>`<div class="pslot" id="vps${i}" onclick="trigVPh(${i})"><svg viewBox="0 0 24 24"><path d="M12 12m-3.2 0a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0-6.4 0M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9z"/></svg><span>${l}</span><button class="xp" onclick="event.stopPropagation();rmVPh(${i})">&times;</button></div>`).join('');
+
+    // Initial checklist
+    document.getElementById('vCkInit').innerHTML = condItems.map((it,i)=>`<div class="cli"><span class="cn">${it}</span><div class="tg"><button class="cr" data-vi="${i}" data-v="ruim" onclick="tgVI(this)">Ruim</button><button class="cm" data-vi="${i}" data-v="media" onclick="tgVI(this)">Média</button><button class="cb" data-vi="${i}" data-v="boa" onclick="tgVI(this)">Boa</button></div></div>`).join('');
+
+    if (editId) {
+        const v = g(K.V).find(x=>x.id===editId);
+        if (v) {
+            document.getElementById('vModel').value = v.model||'';
+            document.getElementById('vBrand').value = v.brand||'';
+            document.getElementById('vYear').value = v.year||'';
+            document.getElementById('vPlate').value = v.plate||'';
+            document.getElementById('vColor').value = v.color||'';
+            document.getElementById('vType').value = v.type||'leve';
+            document.getElementById('vRenavam').value = v.renavam||'';
+            document.getElementById('vChassi').value = v.chassi||'';
+            document.getElementById('vKm').value = v.km||'';
+            document.getElementById('vFuel').value = v.fuel||'flex';
+            document.getElementById('vInsurance').value = v.insurance||'';
+            document.getElementById('vNotes').value = v.notes||'';
+
+            // Load photos
+            if (v.photos) { vPhotos = {...v.photos}; Object.entries(v.photos).forEach(([idx,src])=>{ const sl=document.getElementById('vps'+idx); if(sl){ let im=sl.querySelector('img'); if(!im){im=document.createElement('img');sl.appendChild(im);} im.src=src; sl.classList.add('has'); } }); }
+
+            // Load initial checklist
+            if (v.initialCheck) { Object.entries(v.initialCheck).forEach(([item,val])=>{ const ci = condItems.indexOf(item); if(ci>=0){ const btn=document.querySelector(`[data-vi="${ci}"][data-v="${val}"]`); if(btn) btn.classList.add('on'); } }); }
+        }
+    } else {
+        ['vModel','vBrand','vYear','vPlate','vColor','vRenavam','vChassi','vKm','vInsurance','vNotes'].forEach(id=>document.getElementById(id).value='');
+        document.getElementById('vType').value='leve';
+        document.getElementById('vFuel').value='flex';
+    }
+    openM('mVeh');
+}
+
+function editVeh(id) { openVehModal(id); }
+
+function trigVPh(i) { vCurSlot = i; document.getElementById('vPhotoIn').click(); }
+document.getElementById('vPhotoIn').addEventListener('change', function(e) {
+    if (e.target.files[0] && vCurSlot !== null) {
+        const r = new FileReader();
+        r.onload = ev => {
+            vPhotos[vCurSlot] = ev.target.result;
+            const sl = document.getElementById('vps'+vCurSlot);
+            let im = sl.querySelector('img'); if(!im){im=document.createElement('img');sl.appendChild(im);}
+            im.src = ev.target.result; sl.classList.add('has');
+        };
+        r.readAsDataURL(e.target.files[0]);
+    }
+    e.target.value = '';
+});
+function rmVPh(i) { delete vPhotos[i]; const sl=document.getElementById('vps'+i); const im=sl.querySelector('img'); if(im)im.remove(); sl.classList.remove('has'); }
+function tgVI(b) { document.querySelectorAll(`[data-vi="${b.dataset.vi}"]`).forEach(x=>x.classList.remove('on')); b.classList.add('on'); }
+
+function saveVeh() {
+    const editId = document.getElementById('vEditId').value;
+    const model = document.getElementById('vModel').value.trim();
+    const plate = document.getElementById('vPlate').value.trim().toUpperCase();
+    if (!model||!plate) return toast('Preencha Modelo e Placa','err');
+
+    const initCk = {};
+    condItems.forEach((it,i)=>{ const a=document.querySelector(`[data-vi="${i}"].on`); if(a) initCk[it]=a.dataset.v; });
+
+    const veh = {
+        model, brand: document.getElementById('vBrand').value.trim(),
+        plate, year: parseInt(document.getElementById('vYear').value)||0,
+        color: document.getElementById('vColor').value.trim(),
+        type: document.getElementById('vType').value,
+        renavam: document.getElementById('vRenavam').value.trim(),
+        chassi: document.getElementById('vChassi').value.trim(),
+        km: parseInt(document.getElementById('vKm').value)||0,
+        fuel: document.getElementById('vFuel').value,
+        insurance: document.getElementById('vInsurance').value,
+        notes: document.getElementById('vNotes').value.trim(),
+        photos: {...vPhotos},
+        initialCheck: initCk,
+        active: true
+    };
+
+    const vs = g(K.V);
+    if (editId) {
+        const idx = vs.findIndex(v=>v.id===parseInt(editId));
+        if (idx>=0) { veh.id = vs[idx].id; veh.active = vs[idx].active; vs[idx] = veh; }
+    } else {
+        if (vs.find(v=>v.plate===plate)) return toast('Placa já cadastrada','err');
+        veh.id = Date.now();
+        vs.push(veh);
+    }
+    s(K.V, vs); closeM('mVeh'); toast(editId?'Veículo atualizado!':'Veículo cadastrado!','suc'); renderVehs(); popVehSel();
+}
+
+function viewVeh(id) {
+    const v = g(K.V).find(x=>x.id===id); if(!v) return;
+    let h = `<div class="dtg">
+        <div class="dti"><label>Modelo</label><p>${v.model}</p></div>
+        <div class="dti"><label>Marca</label><p>${v.brand||'-'}</p></div>
+        <div class="dti"><label>Placa</label><p>${v.plate}</p></div>
+        <div class="dti"><label>Ano</label><p>${v.year||'-'}</p></div>
+        <div class="dti"><label>Cor</label><p>${v.color||'-'}</p></div>
+        <div class="dti"><label>Tipo</label><p>${v.type||'-'}</p></div>
+        <div class="dti"><label>RENAVAM</label><p>${v.renavam||'-'}</p></div>
+        <div class="dti"><label>Chassi</label><p>${v.chassi||'-'}</p></div>
+        <div class="dti"><label>KM</label><p>${v.km?v.km.toLocaleString()+' km':'-'}</p></div>
+        <div class="dti"><label>Combustível</label><p>${v.fuel||'-'}</p></div>
+        <div class="dti"><label>Venc. Seguro</label><p>${v.insurance?fmtD(v.insurance):'-'}</p></div>
+    </div>`;
+    if(v.notes) h+=`<p style="padding:10px;background:var(--gray-50);border-radius:8px;font-size:13px;margin-bottom:12px">${v.notes}</p>`;
+    if(v.photos && Object.keys(v.photos).length) {
+        h+='<h4 style="font-size:14px;margin:10px 0 8px">Fotos do Veículo</h4><div class="pgal">';
+        Object.entries(v.photos).forEach(([idx,src])=>{ h+=`<img src="${src}" data-full="${idx}" title="${vehPhotoLbls[idx]||'Foto'}">`; });
+        h+='</div>';
+    }
+    if(v.initialCheck && Object.keys(v.initialCheck).length) {
+        h+='<h4 style="font-size:14px;margin:14px 0 8px">Checklist Inicial</h4><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">';
+        Object.entries(v.initialCheck).forEach(([k,val])=>{ const cls=val==='boa'?'cond-b':val==='media'?'cond-m':'cond-r'; const l=val==='boa'?'Boa':val==='media'?'Média':'Ruim'; h+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--gray-50);border-radius:5px;font-size:12px"><span>${k}</span><span class="cond ${cls}">${l}</span></div>`; });
+        h+='</div>';
+    }
+    document.getElementById('mVehDetailBody').innerHTML = h;
+    // Bind photo clicks
+    document.querySelectorAll('#mVehDetailBody .pgal img').forEach(img => {
+        const idx = img.dataset.full;
+        img.onclick = () => viewPh(v.photos[idx]);
+    });
+    openM('mVehDetail');
+}
+
+function tgVeh(id) { const vs=g(K.V); const i=vs.findIndex(v=>v.id===id); if(i>=0){vs[i].active=!vs[i].active; s(K.V,vs); renderVehs();} }
+
+// ============================================================
+// USERS
+// ============================================================
+function renderUsers() {
+    const us = g(K.U);
+    document.getElementById('usersTbl').innerHTML = us.map(u=>`
+        <tr style="${u.active?'':'opacity:.5'}"><td><b>${u.name}</b></td><td>${u.email}</td><td>${roleLbl[u.role]||u.role}</td><td>${u.active?'<span class="st st-ok"><span class="st-dot"></span>Ativo</span>':'<span class="st st-fail"><span class="st-dot"></span>Inativo</span>'}</td><td><div class="acts"><button class="btn btn-xs ${u.active?'btn-w':'btn-s'}" onclick="tgUser(${u.id})">${u.active?'Desativar':'Ativar'}</button>${u.id!==me.id?`<button class="btn btn-d btn-xs" onclick="delUser(${u.id})">Excluir</button>`:''}</div></td></tr>
+    `).join('');
+}
+
+function openUserModal() { ['nuName','nuEmail','nuPass'].forEach(id=>document.getElementById(id).value=''); document.getElementById('nuRole').value='condutor'; openM('mUser'); }
+
+function saveNewUser() {
+    const n=document.getElementById('nuName').value.trim(), e=document.getElementById('nuEmail').value.trim(), p=document.getElementById('nuPass').value, r=document.getElementById('nuRole').value;
+    if(!n||!e||!p) return toast('Preencha todos os campos','err');
+    if(p.length<6) return toast('Senha mínima: 6 caracteres','err');
+    const us = g(K.U);
+    if(us.find(u=>u.email===e)) return toast('E-mail já cadastrado','err');
+    us.push({ id:Date.now(), name:n, email:e, password:p, role:r, active:true, avatar:'', func:'' });
+    s(K.U,us); closeM('mUser'); toast('Usuário criado!','suc'); renderUsers();
+}
+
+function tgUser(id) { const us=g(K.U); const i=us.findIndex(u=>u.id===id); if(i>=0){us[i].active=!us[i].active; s(K.U,us); renderUsers();} }
+function delUser(id) { if(!confirm('Excluir?')) return; s(K.U, g(K.U).filter(u=>u.id!==id)); toast('Excluído','inf'); renderUsers(); }
+
+// ============================================================
+// PROFILE
+// ============================================================
+function loadProfile() {
+    document.getElementById('profName').value = me.name;
+    document.getElementById('profEmail').value = me.email;
+    document.getElementById('profFunc').value = me.func||'';
+    document.getElementById('profRole').value = me.role;
+    document.getElementById('profPass').value = '';
+
+    const wrap = document.getElementById('profAvWrap');
+    const txt = document.getElementById('profAvTxt');
+    const existingImg = wrap.querySelector('img');
+    if (me.avatar) {
+        if(existingImg) existingImg.src = me.avatar;
+        else { const im = document.createElement('img'); im.src = me.avatar; wrap.insertBefore(im, wrap.firstChild); }
+        txt.style.display = 'none';
+    } else {
+        if(existingImg) existingImg.remove();
+        txt.style.display = '';
+        txt.textContent = me.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    }
+}
+
+document.getElementById('profAvIn').addEventListener('change', function(e) {
+    if(e.target.files[0]) {
+        const r = new FileReader();
+        r.onload = ev => {
+            const wrap = document.getElementById('profAvWrap');
+            const txt = document.getElementById('profAvTxt');
+            let im = wrap.querySelector('img');
+            if(!im) { im = document.createElement('img'); wrap.insertBefore(im, wrap.firstChild); }
+            im.src = ev.target.result; txt.style.display = 'none';
+            me.avatar = ev.target.result;
+        };
+        r.readAsDataURL(e.target.files[0]);
+    }
+    e.target.value = '';
+});
+
+function saveProfile() {
+    const n = document.getElementById('profName').value.trim();
+    const f = document.getElementById('profFunc').value.trim();
+    const p = document.getElementById('profPass').value;
+    if(!n) return toast('Nome é obrigatório','err');
+    if(p && p.length < 6) return toast('Senha mínima: 6 caracteres','err');
+
+    const us = g(K.U); const idx = us.findIndex(u=>u.id===me.id);
+    if(idx>=0) {
+        us[idx].name = n; us[idx].func = f;
+        if(me.avatar) us[idx].avatar = me.avatar;
+        if(p) us[idx].password = p;
+        s(K.U, us);
+        me = us[idx]; sS(me); updSideUser();
+        toast('Perfil atualizado!','suc');
+    }
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+function genReport(type) {
+    const vs=g(K.V), is=g(K.I), out=document.getElementById('rptOut'), title=document.getElementById('rptTitle'), body=document.getElementById('rptBody');
+    out.style.display='block';
+
+    if(type==='fleet') {
+        title.textContent='Relatório de Frota';
+        let h=`<p style="color:var(--gray-500);font-size:12px;margin-bottom:14px">Gerado em ${new Date().toLocaleDateString('pt-BR')} | ${vs.length} veículos</p><div class="tbl-wrap"><table><thead><tr><th>Modelo</th><th>Placa</th><th>Ano</th><th>KM</th><th>Combustível</th><th>Status</th><th>Vistorias</th></tr></thead><tbody>`;
+        vs.forEach(v=>{ const vi=is.filter(i=>i.vehicleId===v.id).length; h+=`<tr><td>${v.model}</td><td>${v.plate}</td><td>${v.year}</td><td>${v.km?v.km.toLocaleString():'-'}</td><td>${v.fuel||'-'}</td><td>${v.active?'Ativo':'Inativo'}</td><td>${vi}</td></tr>`; });
+        h+='</tbody></table></div>'; body.innerHTML=h;
+    } else if(type==='insps') {
+        title.textContent='Relatório de Vistorias';
+        const t=is.length, a=is.filter(i=>i.status==='aprovada').length, r=is.filter(i=>i.status==='reprovada').length, p=is.filter(i=>i.status==='pendente').length;
+        const rate = t?((a/t)*100).toFixed(1):0;
+        let h=`<p style="color:var(--gray-500);font-size:12px;margin-bottom:14px">Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+        <div class="stats" style="margin-bottom:16px">
+            <div style="padding:14px;background:var(--gray-50);border-radius:8px;text-align:center"><h3 style="font-size:22px">${t}</h3><p style="font-size:12px;color:var(--gray-500)">Total</p></div>
+            <div style="padding:14px;background:var(--success-light);border-radius:8px;text-align:center"><h3 style="font-size:22px;color:var(--success)">${a}</h3><p style="font-size:12px;color:var(--gray-500)">Aprovadas</p></div>
+            <div style="padding:14px;background:var(--danger-light);border-radius:8px;text-align:center"><h3 style="font-size:22px;color:var(--danger)">${r}</h3><p style="font-size:12px;color:var(--gray-500)">Reprovadas</p></div>
+            <div style="padding:14px;background:var(--warning-light);border-radius:8px;text-align:center"><h3 style="font-size:22px;color:var(--warning)">${p}</h3><p style="font-size:12px;color:var(--gray-500)">Pendentes</p></div>
+        </div>
+        <p style="font-size:14px;margin-bottom:6px"><b>Taxa de aprovação:</b> ${rate}%</p>
+        <div style="height:20px;background:var(--gray-200);border-radius:10px;overflow:hidden"><div style="height:100%;width:${rate}%;background:var(--success);border-radius:10px"></div></div>`;
+        body.innerHTML=h;
+    } else {
+        title.textContent='Alertas de Manutenção';
+        const vm={}; vs.forEach(v=>vm[v.id]=v);
+        const issues=[];
+        is.forEach(i=>{ if(i.conditions) Object.entries(i.conditions).forEach(([k,val])=>{ if(val==='ruim'||val==='media') issues.push({v:`${(vm[i.vehicleId]||{}).model||''} (${(vm[i.vehicleId]||{}).plate||''})`,k,val,d:i.date}); }); });
+        let h=`<p style="color:var(--gray-500);font-size:12px;margin-bottom:14px">${issues.length} itens identificados</p>`;
+        if(issues.length) {
+            h+='<div class="tbl-wrap"><table><thead><tr><th>Veículo</th><th>Item</th><th>Condição</th><th>Data</th></tr></thead><tbody>';
+            issues.forEach(i=>{ h+=`<tr><td>${i.v}</td><td>${i.k}</td><td><span class="cond ${i.val==='ruim'?'cond-r':'cond-m'}">${i.val==='ruim'?'Ruim':'Média'}</span></td><td>${fmtD(i.d)}</td></tr>`; });
+            h+='</tbody></table></div>';
+        } else h+='<p style="text-align:center;padding:30px;color:var(--gray-400)">Nenhum alerta</p>';
+        body.innerHTML=h;
+    }
+    out.scrollIntoView({behavior:'smooth'});
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function openM(id) { document.getElementById(id).classList.add('on'); }
+function closeM(id) { document.getElementById(id).classList.remove('on'); }
+function fmtD(d) { if(!d) return '-'; const p=d.split('T')[0].split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d; }
+function stBdg(st) { const m={pendente:'<span class="st st-pend"><span class="st-dot"></span>Pendente</span>',aprovada:'<span class="st st-ok"><span class="st-dot"></span>Aprovada</span>',reprovada:'<span class="st st-fail"><span class="st-dot"></span>Reprovada</span>'}; return m[st]||st; }
+function viewPh(src) { document.getElementById('mPhotoImg').src=src; openM('mPhoto'); }
+
+function toast(msg, type='inf') {
+    const c = document.getElementById('toasts'), t = document.createElement('div');
+    t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
+    setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateX(100%)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); },3500);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-ov').forEach(ov=>{ ov.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('on'); }); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-ov.on').forEach(m=>m.classList.remove('on')); });
+</script>
+</body>
+</html>
